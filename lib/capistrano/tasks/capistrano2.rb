@@ -17,7 +17,7 @@ Capistrano::Configuration.instance.load do
 
   if fetch(:sidekiq_default_hooks)
     before 'deploy:update_code', 'sidekiq:quiet'
-    after 'deploy:stop',    'sidekiq:stop'
+    after 'deploy:stop', 'sidekiq:stop'
     after 'deploy:start', 'sidekiq:start'
     before 'deploy:restart', 'sidekiq:restart'
   end
@@ -26,10 +26,10 @@ Capistrano::Configuration.instance.load do
     def for_each_process(&block)
       fetch(:sidekiq_processes).times do |idx|
         pid_file = if idx.zero? && fetch(:sidekiq_processes) <= 1
-          fetch(:sidekiq_pid)
-        else
-          fetch(:sidekiq_pid).gsub(/\.pid$/, "-#{idx}.pid")
-        end
+                     fetch(:sidekiq_pid)
+                   else
+                     fetch(:sidekiq_pid).gsub(/\.pid$/, "-#{idx}.pid")
+                   end
         yield(pid_file, idx)
       end
     end
@@ -55,8 +55,8 @@ Capistrano::Configuration.instance.load do
         args.push "--index #{idx}"
         args.push "--pidfile #{pid_file}"
         args.push "--environment #{fetch(:sidekiq_env)}"
-        args.push "--logfile #{fetch(:sidekiq_log)}"
-        args.push fetch(:sidekiq_options)
+        args.push "--logfile #{fetch(:sidekiq_log)}" if fetch(:sidekiq_log)
+        args.push fetch(:sidekiq_options) if fetch(:sidekiq_options)
 
         if defined?(JRUBY_VERSION)
           args.push ">/dev/null 2>&1 &"
